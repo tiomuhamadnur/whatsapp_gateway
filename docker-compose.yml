@@ -1,0 +1,107 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - laravel-app
+      - node-wa
+    networks:
+      - wa_network
+
+  laravel-app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - laravel_storage:/var/www/html/storage
+    environment:
+      APP_ENV: production
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      NODE_WA_URL: http://node-wa:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - wa_network
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /var/www/html
+    command: php artisan queue:work redis --tries=3 --timeout=30
+    volumes:
+      - ./:/var/www/html
+      - laravel_storage:/var/www/html/storage
+    depends_on:
+      - laravel-app
+      - redis
+    networks:
+      - wa_network
+
+  node-wa:
+    build:
+      context: ./node-wa
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: wa_gateway
+      DB_USER: wa_user
+      DB_PASSWORD: secret_password
+      LARAVEL_WEBHOOK_URL: http://nginx/webhook/whatsapp
+      INTERNAL_SECRET: ${NODE_INTERNAL_SECRET:-change-me-internal-secret}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-change-me-webhook-secret}
+      SESSION_PATH: /app/sessions
+    volumes:
+      - sessions_data:/app/sessions
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - wa_network
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: wa_gateway
+      MYSQL_USER: wa_user
+      MYSQL_PASSWORD: secret_password
+      MYSQL_ROOT_PASSWORD: root_secret_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wa_network
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - wa_network
+
+volumes:
+  mysql_data:
+  sessions_data:
+  laravel_storage:
+
+networks:
+  wa_network:
+    driver: bridge

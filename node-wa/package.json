@@ -1,0 +1,19 @@
+{
+  "name": "wa-gateway-node",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.18",
+    "axios": "^1.11.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.5",
+    "pino": "^8.21.0",
+    "qrcode": "^1.5.4"
+  }
+}
