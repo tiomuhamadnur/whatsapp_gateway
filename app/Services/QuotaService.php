@@ -110,7 +110,11 @@ class QuotaService
             $footer = $plan->footer_text ?: "\n\nPowered by WA Gateway";
 
             if (! str_ends_with($content, $footer)) {
-                return $content.$footer;
+                // Ensure there's spacing before footer
+                if (! str_ends_with($content, "\n\n")) {
+                    $content .= "\n\n";
+                }
+                return $content . ltrim($footer, "\n");
             }
         }
 
