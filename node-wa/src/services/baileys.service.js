@@ -31,7 +31,7 @@ async function createSession(sessionId) {
     auth: state,
     logger,
     printQRInTerminal: false,
-    browser: ['WA Gateway', 'Chrome', '1.0.0']
+    browser: ['SapaChat', 'Chrome', '1.0.0']
   });
 
   sessions.set(sessionId, {
@@ -417,6 +417,31 @@ function buildMessageContent(payload) {
     return {
       video: { url: payload.media_url },
       caption: payload.message || ''
+    };
+  }
+
+  if (payload.type === 'location') {
+    return {
+      location: {
+        degreesLatitude: payload.latitude,
+        degreesLongitude: payload.longitude
+      },
+      address: payload.address || payload.message || ''
+    };
+  }
+
+  if (payload.type === 'buttons') {
+    const buttons = payload.buttons.map(btn => ({
+      buttonId: btn.id,
+      buttonText: { displayText: btn.text },
+      type: 1
+    }));
+
+    return {
+      text: payload.message,
+      footer: payload.footer || '',
+      buttons: buttons,
+      headerType: 1
     };
   }
 

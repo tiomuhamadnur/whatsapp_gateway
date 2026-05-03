@@ -27,7 +27,7 @@
             <label>
                 <span class="text-sm font-medium">Message type <span class="required-mark">*</span></span>
                 <select name="type" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">
-                    @foreach (['text', 'image', 'document', 'audio', 'video'] as $type)
+                    @foreach (['text', 'image', 'document', 'audio', 'video', 'location', 'buttons'] as $type)
                         <option value="{{ $type }}" @selected(old('type', 'text') === $type)>{{ $type }}</option>
                     @endforeach
                 </select>
@@ -35,6 +35,22 @@
             <label>
                 <span class="text-sm font-medium">Media URL</span>
                 <input name="media_url" value="{{ old('media_url') }}" placeholder="https://example.com/file.jpg" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">
+            </label>
+            <label class="location-fields" style="display: none;">
+                <span class="text-sm font-medium">Latitude <span class="required-mark">*</span></span>
+                <input name="latitude" type="number" step="any" value="{{ old('latitude') }}" placeholder="-6.2088" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">
+            </label>
+            <label class="location-fields" style="display: none;">
+                <span class="text-sm font-medium">Longitude <span class="required-mark">*</span></span>
+                <input name="longitude" type="number" step="any" value="{{ old('longitude') }}" placeholder="106.8456" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">
+            </label>
+            <label class="location-fields" style="display: none;">
+                <span class="text-sm font-medium">Address</span>
+                <input name="address" value="{{ old('address') }}" placeholder="Jakarta, Indonesia" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">
+            </label>
+            <label class="buttons-fields" style="display: none;">
+                <span class="text-sm font-medium">Buttons (JSON)</span>
+                <textarea name="buttons" rows="3" placeholder='[{"text": "Button 1", "id": "btn1"}, {"text": "Button 2", "id": "btn2"}]' class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-950">{{ old('buttons') }}</textarea>
             </label>
             <label class="lg:col-span-2">
                 <span class="text-sm font-medium">Message content <span class="required-mark">*</span></span>
@@ -87,7 +103,7 @@
                             <td class="px-4 py-3">{{ $message->direction }}</td>
                             <td class="wrap-anywhere px-4 py-3">{{ $message->to_number ?: $message->from_number }}</td>
                             <td class="wrap-anywhere max-w-sm px-4 py-3">{{ $message->content }}</td>
-                            <td class="px-4 py-3">{{ $message->status }}</td>
+                            <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-medium {{ statusBadge($message->status) }}">{{ $message->status }}</span></td>
                             <td class="px-4 py-3 text-zinc-500">{{ $message->created_at->format('Y-m-d H:i') }}</td>
                         </tr>
                     @empty

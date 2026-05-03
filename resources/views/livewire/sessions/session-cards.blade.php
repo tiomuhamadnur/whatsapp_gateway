@@ -7,7 +7,7 @@
                         <h2 class="font-semibold">{{ $session->name ?: 'Untitled Session' }}</h2>
                         <p class="mt-1 wrap-anywhere text-xs text-zinc-500">{{ $session->session_id }}</p>
                     </div>
-                    <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium">{{ $session->status }}</span>
+                    <span class="rounded-full px-2 py-1 text-xs font-medium {{ statusBadge($session->status) }}">{{ $session->status }}</span>
                 </div>
 
                 <dl class="mt-4 space-y-2 text-sm">

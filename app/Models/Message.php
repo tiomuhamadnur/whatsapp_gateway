@@ -22,6 +22,7 @@ class Message extends Model
         'type',
         'content',
         'media_url',
+        'payload',
         'status',
         'wa_message_id',
         'error_message',
@@ -39,6 +40,7 @@ class Message extends Model
         return [
             'scheduled_at' => 'datetime',
             'broadcast_targets' => 'array',
+            'payload' => 'array',
             'recurrence_until' => 'datetime',
             'sent_at' => 'datetime',
         ];

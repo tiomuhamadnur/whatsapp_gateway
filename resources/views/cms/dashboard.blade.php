@@ -20,13 +20,16 @@
                 <h2 class="font-semibold">Recent Sessions</h2>
             </div>
             <div class="divide-y divide-zinc-100">
-                @forelse ($recentSessions as $session)
+                @forelse ($recentSessions->take(10) as $session)
                     <div class="flex items-center justify-between gap-4 px-4 py-3 text-sm">
                         <div>
                             <div class="font-medium">{{ $session->name ?: 'Untitled Session' }}</div>
                             <div class="wrap-anywhere mt-1 text-zinc-500">{{ $session->session_id }}</div>
                         </div>
-                        <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium">{{ $session->status }}</span>
+                        <div class="text-right">
+                            <span class="rounded-full px-2 py-1 text-xs font-medium {{ statusBadge($session->status) }}">{{ $session->status }}</span>
+                            <div class="mt-1 text-xs text-zinc-500">{{ $session->created_at->format('M j, H:i') }}</div>
+                        </div>
                     </div>
                 @empty
                     <div class="px-4 py-8 text-sm text-zinc-500">No WhatsApp sessions yet.</div>
@@ -39,11 +42,14 @@
                 <h2 class="font-semibold">Recent Messages</h2>
             </div>
             <div class="divide-y divide-zinc-100">
-                @forelse ($recentMessages as $message)
+                @forelse ($recentMessages->take(10) as $message)
                     <div class="px-4 py-3 text-sm">
                         <div class="flex items-center justify-between gap-4">
                             <div class="wrap-anywhere font-medium">{{ $message->to_number ?: $message->from_number }}</div>
-                            <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium">{{ $message->status }}</span>
+                            <div class="text-right">
+                                <span class="rounded-full px-2 py-1 text-xs font-medium {{ statusBadge($message->status) }}">{{ $message->status }}</span>
+                                <div class="mt-1 text-xs text-zinc-500">{{ $message->created_at->format('M j, H:i') }}</div>
+                            </div>
                         </div>
                         <div class="wrap-anywhere mt-1 text-zinc-500">{{ $message->content }}</div>
                     </div>

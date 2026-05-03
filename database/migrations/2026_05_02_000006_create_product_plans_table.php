@@ -38,7 +38,7 @@ return new class extends Migration
                 'can_send_media' => false,
                 'can_use_webhook' => false,
                 'enforce_footer' => true,
-                'footer_text' => "\n\nPowered by WA Gateway",
+                'footer_text' => "\n\nPowered by SapaChat",
                 'is_custom' => false,
                 'is_active' => true,
                 'sort_order' => 10,

@@ -57,7 +57,7 @@
             </label>
             <label class="lg:col-span-2">
                 <span class="text-sm font-medium">Footer text</span>
-                <input name="footer_text" placeholder="Powered by WA Gateway" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
+                <input name="footer_text" placeholder="Powered by SapaChat" class="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
             </label>
             <div class="lg:col-span-2">
                 <button class="rounded-md bg-zinc-950 px-4 py-2 text-sm font-semibold text-white">Create Plan</button>

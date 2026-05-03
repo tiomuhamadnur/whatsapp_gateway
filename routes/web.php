@@ -6,6 +6,7 @@ use App\Http\Controllers\Cms\AuthController;
 use App\Http\Controllers\Cms\DashboardController;
 use App\Http\Controllers\Cms\DirectoryController;
 use App\Http\Controllers\Cms\MessageController;
+use App\Http\Controllers\Cms\ProfileController;
 use App\Http\Controllers\Cms\SessionController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\ProductPlanController;
@@ -53,6 +54,9 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('cms.tokens.destroy');
 
     Route::get('/api-docs', ApiDocumentationController::class)->name('cms.docs.api');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('cms.profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('cms.profile.update');
 
     Route::middleware('owner')->prefix('owner')->name('owner.')->group(function (): void {
         Route::get('/', OwnerDashboardController::class)->name('dashboard');

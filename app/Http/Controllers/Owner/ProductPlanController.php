@@ -15,7 +15,7 @@ class ProductPlanController extends Controller
     {
         return view('owner.plans.index', [
             'plans' => ProductPlan::query()->orderBy('sort_order')->get(),
-            'types' => ['text', 'image', 'document', 'audio', 'video'],
+            'types' => ['text', 'image', 'document', 'audio', 'video', 'location', 'buttons'],
         ]);
     }
 
@@ -55,7 +55,7 @@ class ProductPlanController extends Controller
             'daily_message_quota' => ['required', 'integer', 'min:0'],
             'max_sessions' => ['required', 'integer', 'min:0'],
             'allowed_message_types' => ['nullable', 'array'],
-            'allowed_message_types.*' => ['in:text,image,document,audio,video'],
+            'allowed_message_types.*' => ['in:text,image,document,audio,video,location,buttons'],
             'can_send_media' => ['nullable', 'boolean'],
             'can_use_webhook' => ['nullable', 'boolean'],
             'enforce_footer' => ['nullable', 'boolean'],

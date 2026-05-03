@@ -38,9 +38,15 @@ class MessageController extends Controller
             'targets' => ['nullable', 'array', 'min:1'],
             'targets.*' => ['string', 'max:255'],
             'target_type' => ['nullable', 'in:contact,group,broadcast'],
-            'type' => ['nullable', 'in:text,image,document,audio,video'],
+            'type' => ['nullable', 'in:text,image,document,audio,video,location,buttons'],
             'message' => ['required', 'string'],
             'media_url' => ['nullable', 'url', 'max:500'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'buttons' => ['nullable', 'array'],
+            'buttons.*.text' => ['required', 'string', 'max:255'],
+            'buttons.*.id' => ['required', 'string', 'max:255'],
             'scheduled_at' => ['nullable', 'date'],
             'recurrence' => ['nullable', 'in:none,daily,weekly,monthly,custom'],
             'recurrence_interval' => ['nullable', 'integer', 'min:1', 'max:365'],
@@ -92,6 +98,28 @@ class MessageController extends Controller
             ], 422);
         }
 
+        // Validate location fields
+        if ($type === 'location') {
+            if (empty($validated['latitude']) || empty($validated['longitude'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Latitude and longitude are required for location messages.',
+                    'code' => 'LOCATION_FIELDS_REQUIRED',
+                ], 422);
+            }
+        }
+
+        // Validate buttons
+        if ($type === 'buttons') {
+            if (empty($validated['buttons'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one button is required for button messages.',
+                    'code' => 'BUTTONS_REQUIRED',
+                ], 422);
+            }
+        }
+
         if (in_array($type, ['image', 'document', 'audio', 'video']) && ! $this->isValidMediaUrl($validated['media_url'])) {
             return response()->json([
                 'success' => false,
@@ -111,6 +139,19 @@ class MessageController extends Controller
         $created = [];
         $status = $this->scheduledStatus($validated['scheduled_at'] ?? null);
 
+        $payload = [];
+        if ($type === 'location') {
+            $payload = [
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'address' => $validated['address'] ?? null,
+            ];
+        } elseif ($type === 'buttons') {
+            $payload = [
+                'buttons' => $validated['buttons'],
+            ];
+        }
+
         foreach ($targets as $target) {
             try {
                 $quota->decrementQuota($user);
@@ -128,6 +169,7 @@ class MessageController extends Controller
             'type' => $type,
             'content' => $quota->applyMessagePolicy($user, $type, $validated['message']),
             'media_url' => $validated['media_url'] ?? null,
+            'payload' => $payload,
                 'status' => $status,
                 'scheduled_at' => $validated['scheduled_at'] ?? null,
                 'recurrence' => ($validated['recurrence'] ?? 'none') === 'none' ? null : $validated['recurrence'],

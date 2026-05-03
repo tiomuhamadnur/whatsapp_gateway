@@ -59,7 +59,7 @@
                         'target_type' => 'contact',
                         'to' => '6281234567890',
                         'type' => 'text',
-                        'message' => 'Hello from WA Gateway'
+                        'message' => 'Hello from SapaChat'
                     ], JSON_PRETTY_PRINT)],
                     ['POST', '/api/messages/send', 'Send a message to a group ID.', json_encode([
                         'session_id' => '{{session_id}}',
@@ -74,6 +74,27 @@
                         'targets' => ['6281234567890', '6289876543210', '120363xxxxx@g.us'],
                         'type' => 'text',
                         'message' => 'Promo broadcast'
+                    ], JSON_PRETTY_PRINT)],
+                    ['POST', '/api/messages/send', 'Send a location message.', json_encode([
+                        'session_id' => '{{session_id}}',
+                        'target_type' => 'contact',
+                        'to' => '6281234567890',
+                        'type' => 'location',
+                        'message' => 'Here is my location',
+                        'latitude' => -6.2088,
+                        'longitude' => 106.8456,
+                        'address' => 'Jakarta, Indonesia'
+                    ], JSON_PRETTY_PRINT)],
+                    ['POST', '/api/messages/send', 'Send a button message.', json_encode([
+                        'session_id' => '{{session_id}}',
+                        'target_type' => 'contact',
+                        'to' => '6281234567890',
+                        'type' => 'buttons',
+                        'message' => 'Choose an option:',
+                        'buttons' => [
+                            ['text' => 'Option 1', 'id' => 'opt1'],
+                            ['text' => 'Option 2', 'id' => 'opt2']
+                        ]
                     ], JSON_PRETTY_PRINT)],
                     ['POST', '/api/messages/send', 'Schedule a message and repeat it daily, weekly, monthly, or with a custom interval.', json_encode([
                         'session_id' => '{{session_id}}',

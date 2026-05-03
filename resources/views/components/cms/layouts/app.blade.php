@@ -1,11 +1,12 @@
-@props(['title' => 'WA Gateway CMS', 'heading' => null, 'eyebrow' => 'CMS'])
+@props(['title' => 'SapaChat CMS', 'heading' => null, 'eyebrow' => 'CMS'])
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'WA Gateway CMS' }}</title>
+    <title>{{ $title ?? 'SapaChat CMS' }}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -25,6 +26,7 @@
                 @php
                     $items = [
                         ['Dashboard', 'cms.dashboard', 'fa-chart-line'],
+                        ['Profile', 'cms.profile.edit', 'fa-user'],
                         ['Sessions', 'cms.sessions.index', 'fa-mobile-screen-button'],
                         ['Messages', 'cms.messages.index', 'fa-comments'],
                         ['API Tokens', 'cms.tokens.index', 'fa-key'],
@@ -66,7 +68,7 @@
                         </button>
                         <div>
                             <p class="text-xs font-medium text-zinc-500">{{ $eyebrow ?? 'CMS' }}</p>
-                            <h1 class="text-xl font-semibold tracking-tight">{{ $heading ?? $title ?? 'WA Gateway' }}</h1>
+                            <h1 class="text-xl font-semibold tracking-tight">{{ $heading ?? $title ?? 'SapaChat' }}</h1>
                         </div>
                     </div>
                     @php($activeSubscription = auth()->user()->subscriptions()->with('productPlan')->where('is_active', true)->latest('ends_at')->first())
@@ -109,6 +111,9 @@
                 @endif
 
                 {{ $slot }}
+                <footer class="mt-10 rounded-lg border-t border-zinc-200 pt-5 text-xs text-zinc-500">
+                    Developed by Tio Muhamad Nur © 2026
+                </footer>
             </div>
         </main>
     </div>

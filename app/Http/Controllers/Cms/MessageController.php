@@ -56,9 +56,13 @@ class MessageController extends Controller
             'session_id' => ['required', 'uuid'],
             'to' => ['required', 'string', 'max:100'],
             'target_type' => ['nullable', 'in:contact,group'],
-            'type' => ['required', 'in:text,image,document,audio,video'],
+            'type' => ['required', 'in:text,image,document,audio,video,location,buttons'],
             'message' => ['required', 'string'],
             'media_url' => ['nullable', 'url', 'max:500'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'buttons' => ['nullable', 'json'],
             'scheduled_at' => ['nullable', 'date'],
             'recurrence' => ['nullable', 'in:none,daily,weekly,monthly,custom'],
             'recurrence_interval' => ['nullable', 'integer', 'min:1', 'max:365'],
@@ -88,6 +92,26 @@ class MessageController extends Controller
             return back()->withErrors(['type' => 'Your current plan does not support this message type.'])->withInput();
         }
 
+        // Validate location fields
+        if ($validated['type'] === 'location') {
+            if (empty($validated['latitude']) || empty($validated['longitude'])) {
+                return back()->withErrors(['latitude' => 'Latitude and longitude are required for location messages.'])->withInput();
+            }
+        }
+
+        // Validate buttons
+        if ($validated['type'] === 'buttons') {
+            $buttons = json_decode($validated['buttons'] ?? '[]', true);
+            if (!is_array($buttons) || empty($buttons)) {
+                return back()->withErrors(['buttons' => 'At least one button is required for button messages.'])->withInput();
+            }
+            foreach ($buttons as $button) {
+                if (!isset($button['text']) || !isset($button['id'])) {
+                    return back()->withErrors(['buttons' => 'Each button must have text and id.'])->withInput();
+                }
+            }
+        }
+
         if (! $quota->hasQuota($user)) {
             return back()->withErrors(['message' => 'Your message quota has been used up. Upgrade your plan to send more messages.'])->withInput();
         }
@@ -100,6 +124,19 @@ class MessageController extends Controller
 
         $status = isset($validated['scheduled_at']) && now()->lt($validated['scheduled_at']) ? 'scheduled' : 'queued';
 
+        $payload = [];
+        if ($validated['type'] === 'location') {
+            $payload = [
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'address' => $validated['address'] ?? null,
+            ];
+        } elseif ($validated['type'] === 'buttons') {
+            $payload = [
+                'buttons' => json_decode($validated['buttons'], true),
+            ];
+        }
+
         $message = Message::query()->create([
             'user_id' => $user->id,
             'session_id' => $validated['session_id'],
@@ -109,6 +146,7 @@ class MessageController extends Controller
             'type' => $validated['type'],
             'content' => $quota->applyMessagePolicy($user, $validated['type'], $validated['message']),
             'media_url' => $validated['media_url'] ?? null,
+            'payload' => $payload,
             'status' => $status,
             'scheduled_at' => $validated['scheduled_at'] ?? null,
             'recurrence' => ($validated['recurrence'] ?? 'none') === 'none' ? null : $validated['recurrence'],

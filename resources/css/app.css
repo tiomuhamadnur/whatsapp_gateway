@@ -12,22 +12,52 @@
 
 @layer components {
     .sidebar-shell {
-        transition: width 180ms ease;
+        transition: width 180ms ease, transform 180ms ease;
     }
 
     .sidebar-label {
         transition: opacity 160ms ease, width 160ms ease;
     }
 
-    .sidebar-collapsed .sidebar-shell {
+    .sidebar-collapsed [data-sidebar] {
         width: 5rem;
     }
 
+    .sidebar-collapsed [data-sidebar] nav {
+        align-items: center;
+    }
+
+    .sidebar-collapsed [data-sidebar] a {
+        justify-content: center;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
     .sidebar-collapsed .sidebar-label {
-        width: 0;
+        display: none;
         opacity: 0;
+        width: 0;
         overflow: hidden;
         white-space: nowrap;
+    }
+
+    .sidebar-collapsed [data-sidebar] a {
+        position: relative;
+    }
+
+    .sidebar-collapsed [data-sidebar] a:hover .sidebar-label {
+        display: block;
+        position: absolute;
+        left: 5.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        z-index: 20;
+        padding: 0.5rem 0.75rem;
+        background: #ffffff;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
     }
 
     .sidebar-collapsed .content-shell {

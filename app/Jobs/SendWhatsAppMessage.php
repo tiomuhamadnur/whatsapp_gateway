@@ -51,7 +51,7 @@ class SendWhatsAppMessage implements ShouldQueue
         \Log::info("Sending message ID {$message->id} to {$message->to_number}");
 
         try {
-            $response = $node->sendMessage([
+            $response = $node->sendMessage(array_merge([
                 'message_id' => $message->id,
                 'session_id' => $message->session_id,
                 'to' => $message->to_number,
@@ -59,7 +59,7 @@ class SendWhatsAppMessage implements ShouldQueue
                 'type' => $message->type,
                 'message' => $message->content,
                 'media_url' => $message->media_url,
-            ]);
+            ], $message->payload ?? []));
 
             $message->update([
                 'status' => $response['data']['status'] ?? 'sending',

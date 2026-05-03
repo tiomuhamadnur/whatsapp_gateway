@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_photo_path',
     ];
 
     /**
@@ -72,6 +73,13 @@ class User extends Authenticatable
             ->where('starts_at', '<=', now())
             ->where('ends_at', '>=', now())
             ->latest('ends_at');
+    }
+
+    public function profilePhotoUrl(): ?string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/' . $this->profile_photo_path)
+            : null;
     }
 
     public function isPrivileged(): bool

@@ -107,7 +107,7 @@ class QuotaService
         $plan = $this->currentPlan($user);
 
         if ($plan?->enforce_footer && $type === 'text') {
-            $footer = $plan->footer_text ?: "\n\nPowered by WA Gateway";
+            $footer = $plan->footer_text ?: "\n\nPowered by SapaChat";
 
             if (! str_ends_with($content, $footer)) {
                 // Ensure there's spacing before footer

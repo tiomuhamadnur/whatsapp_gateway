@@ -179,3 +179,16 @@ document.addEventListener('submit', (event) => {
 if (localStorage.getItem('sidebar-collapsed') === '1') {
     document.documentElement.classList.add('sidebar-collapsed');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const typeSelect = document.querySelector('select[name="type"]');
+    if (typeSelect) {
+        const toggleFields = () => {
+            const selectedType = typeSelect.value;
+            document.querySelectorAll('.location-fields').forEach(el => el.style.display = selectedType === 'location' ? 'block' : 'none');
+            document.querySelectorAll('.buttons-fields').forEach(el => el.style.display = selectedType === 'buttons' ? 'block' : 'none');
+        };
+        typeSelect.addEventListener('change', toggleFields);
+        toggleFields(); // Initial call
+    }
+});
