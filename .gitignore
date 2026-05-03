@@ -22,3 +22,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/node-wa/node_modules
+/node-wa/sessions
