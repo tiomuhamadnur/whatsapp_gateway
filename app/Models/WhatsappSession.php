@@ -38,4 +38,14 @@ class WhatsappSession extends Model
     {
         return $this->hasMany(Message::class, 'session_id', 'session_id');
     }
+
+    public function groups(): HasMany
+    {
+        return $this->hasMany(WhatsappGroup::class, 'session_id', 'session_id');
+    }
+
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(WhatsappContact::class, 'session_id', 'session_id');
+    }
 }

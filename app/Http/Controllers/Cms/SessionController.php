@@ -7,10 +7,12 @@ use App\Models\WhatsappSession;
 use App\Services\QuotaService;
 use App\Services\WhatsAppNodeService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class SessionController extends Controller
 {
@@ -19,9 +21,24 @@ class SessionController extends Controller
         return view('cms.sessions.index', [
             'sessions' => WhatsappSession::query()
                 ->where('user_id', $request->user()->id)
+                ->withCount(['groups', 'contacts'])
                 ->latest()
                 ->paginate(12),
         ]);
+    }
+
+    public function datatable(Request $request): JsonResponse
+    {
+        $query = WhatsappSession::query()
+            ->where('user_id', $request->user()->id)
+            ->withCount(['groups', 'contacts'])
+            ->latest();
+
+        return DataTables::eloquent($query)
+            ->editColumn('groups_count', fn (WhatsappSession $session): string => number_format($session->groups_count))
+            ->editColumn('contacts_count', fn (WhatsappSession $session): string => number_format($session->contacts_count))
+            ->editColumn('last_active_at', fn (WhatsappSession $session): string => $session->last_active_at?->format('Y-m-d H:i') ?: '-')
+            ->toJson();
     }
 
     public function update(Request $request, string $sessionId): RedirectResponse
@@ -36,7 +53,7 @@ class SessionController extends Controller
             'name' => $validated['name'] ?? null,
         ]);
 
-        return back()->with('status', 'Session berhasil diubah.');
+        return back()->with('status', 'Session updated successfully.');
     }
 
     public function store(Request $request, QuotaService $quota, WhatsAppNodeService $node): RedirectResponse
@@ -52,7 +69,7 @@ class SessionController extends Controller
             ->count();
 
         if ($currentSessions >= $quota->getMaxSessions($user)) {
-            return back()->withErrors(['name' => 'Batas jumlah sesi WhatsApp untuk paket Anda sudah tercapai.']);
+            return back()->withErrors(['name' => 'Your current plan has reached the maximum number of WhatsApp sessions.']);
         }
 
         $session = WhatsappSession::query()->create([
@@ -67,13 +84,13 @@ class SessionController extends Controller
 
             return redirect()
                 ->route('cms.sessions.index')
-                ->with('status', 'Sesi dibuat. Tunggu QR muncul lalu scan dari WhatsApp.');
+                ->with('status', 'Session created. Wait for the QR code, then scan it from WhatsApp.');
         } catch (Throwable $throwable) {
             report($throwable);
 
             return redirect()
                 ->route('cms.sessions.index')
-                ->with('status', 'Sesi dibuat, tapi Node WA belum bisa dihubungi. Jalankan node-wa lalu coba refresh.');
+                ->with('status', 'Session created, but Node WA is not reachable yet. Start node-wa, then refresh this page.');
         }
     }
 
@@ -89,7 +106,7 @@ class SessionController extends Controller
 
         $session->update(['status' => 'disconnected']);
 
-        return back()->with('status', 'Sesi WhatsApp diputus.');
+        return back()->with('status', 'WhatsApp session disconnected.');
     }
 
     public function destroy(Request $request, string $sessionId, WhatsAppNodeService $node): RedirectResponse
@@ -104,7 +121,7 @@ class SessionController extends Controller
 
         $session->delete();
 
-        return back()->with('status', 'Session berhasil dihapus permanen.');
+        return back()->with('status', 'Session permanently deleted.');
     }
 
     private function ownedSession(Request $request, string $sessionId): WhatsappSession

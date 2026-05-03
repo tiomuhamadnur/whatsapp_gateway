@@ -1,6 +1,6 @@
-@props(['search' => 'Cari data...', 'perPage' => 10])
+@props(['search' => 'Search records...', 'perPage' => 10])
 
-<div class="rounded-xl border border-zinc-200 bg-white shadow-sm" data-data-table data-per-page="{{ $perPage }}">
+<div class="rounded-lg border border-zinc-200 bg-white shadow-sm" data-data-table data-yajra-table data-per-page="{{ $perPage }}">
     <div class="border-b border-zinc-200 p-3">
         <input
             type="search"

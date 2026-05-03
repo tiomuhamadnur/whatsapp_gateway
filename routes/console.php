@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('messages:dispatch-scheduled')->everyMinute();
+Schedule::command('messages:prune-history --days=60')->dailyAt('02:15');

@@ -34,9 +34,9 @@ class MessageController extends Controller
     {
         $validated = $request->validate([
             'session_id' => ['required', 'uuid'],
-            'to' => ['nullable', 'string', 'max:100'],
+            'to' => ['nullable', 'string', 'max:255'],
             'targets' => ['nullable', 'array', 'min:1'],
-            'targets.*' => ['string', 'max:100'],
+            'targets.*' => ['string', 'max:255'],
             'target_type' => ['nullable', 'in:contact,group,broadcast'],
             'type' => ['nullable', 'in:text,image,document,audio,video'],
             'message' => ['required', 'string'],
@@ -57,7 +57,7 @@ class MessageController extends Controller
         if (! $sessionExists) {
             return response()->json([
                 'success' => false,
-                'message' => 'Sesi WhatsApp tidak ditemukan atau belum connected.',
+                'message' => 'WhatsApp session was not found or is not connected.',
                 'code' => 'SESSION_NOT_CONNECTED',
             ], 422);
         }
@@ -69,8 +69,16 @@ class MessageController extends Controller
         if ($targets === []) {
             return response()->json([
                 'success' => false,
-                'message' => 'Target tujuan wajib diisi.',
+                'message' => 'At least one target recipient is required.',
                 'code' => 'TARGET_REQUIRED',
+            ], 422);
+        }
+
+        if ($targetType === 'contact' && count($targets) > 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Contact messages can only have one target.',
+                'code' => 'INVALID_TARGET_COUNT',
             ], 422);
         }
 
@@ -79,7 +87,7 @@ class MessageController extends Controller
         if (! $quota->canSendType($user, $type)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Paket Anda belum mendukung tipe pesan ini.',
+                'message' => 'Your current plan does not support this message type.',
                 'code' => 'MESSAGE_TYPE_NOT_ALLOWED',
             ], 422);
         }
@@ -87,7 +95,7 @@ class MessageController extends Controller
         if (! $quota->hasQuota($user)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kuota pesan habis. Silakan upgrade paket Anda.',
+                'message' => 'Your message quota has been used up. Upgrade your plan to send more messages.',
                 'code' => 'QUOTA_EXCEEDED',
             ], 402);
         }
@@ -136,7 +144,7 @@ class MessageController extends Controller
         if ($created === []) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kuota pesan tidak cukup untuk target broadcast.',
+                'message' => 'Your message quota is not enough for the broadcast targets.',
                 'code' => 'QUOTA_EXCEEDED',
             ], 402);
         }

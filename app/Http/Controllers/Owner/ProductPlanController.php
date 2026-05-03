@@ -23,21 +23,21 @@ class ProductPlanController extends Controller
     {
         ProductPlan::query()->create($this->validatedData($request));
 
-        return back()->with('status', 'Paket layanan berhasil dibuat.');
+        return back()->with('status', 'Product plan created successfully.');
     }
 
     public function update(Request $request, ProductPlan $plan): RedirectResponse
     {
         $plan->update($this->validatedData($request, $plan));
 
-        return back()->with('status', 'Paket layanan berhasil diperbarui.');
+        return back()->with('status', 'Product plan updated successfully.');
     }
 
     public function destroy(ProductPlan $plan): RedirectResponse
     {
         $plan->update(['is_active' => false]);
 
-        return back()->with('status', 'Paket layanan dinonaktifkan.');
+        return back()->with('status', 'Product plan deactivated.');
     }
 
     /**

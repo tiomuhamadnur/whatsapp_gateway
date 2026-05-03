@@ -1,15 +1,15 @@
-<x-cms.layouts.app title="Dashboard" heading="Dashboard" eyebrow="Ringkasan">
+<x-cms.layouts.app title="Dashboard" heading="Dashboard" eyebrow="Overview">
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         @foreach ([
-            ['Sessions', $sessionCount],
-            ['Connected', $connectedCount],
-            ['Queued', $queuedCount],
-            ['Sent', $sentCount],
-            ['Quota Left', $remainingQuota],
-        ] as [$label, $value])
+            ['Sessions', $sessionCount, false],
+            ['Connected', $connectedCount, false],
+            ['Queued', $queuedCount, false],
+            ['Sent', $sentCount, false],
+            ['Quota Left', $remainingQuota, true],
+        ] as [$label, $value, $useLargeFormat])
             <div class="rounded-lg border border-zinc-200 bg-white p-4">
                 <div class="text-sm font-medium text-zinc-500">{{ $label }}</div>
-                <div class="mt-2 text-3xl font-semibold tracking-tight">{{ $value }}</div>
+                <div class="mt-2 truncate text-3xl font-semibold tracking-tight">{{ $useLargeFormat ? formatLarge($value) : number_format($value) }}</div>
             </div>
         @endforeach
     </section>
@@ -24,12 +24,12 @@
                     <div class="flex items-center justify-between gap-4 px-4 py-3 text-sm">
                         <div>
                             <div class="font-medium">{{ $session->name ?: 'Untitled Session' }}</div>
-                            <div class="mt-1 text-zinc-500">{{ $session->session_id }}</div>
+                            <div class="wrap-anywhere mt-1 text-zinc-500">{{ $session->session_id }}</div>
                         </div>
                         <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium">{{ $session->status }}</span>
                     </div>
                 @empty
-                    <div class="px-4 py-8 text-sm text-zinc-500">Belum ada sesi WhatsApp.</div>
+                    <div class="px-4 py-8 text-sm text-zinc-500">No WhatsApp sessions yet.</div>
                 @endforelse
             </div>
         </div>
@@ -42,13 +42,13 @@
                 @forelse ($recentMessages as $message)
                     <div class="px-4 py-3 text-sm">
                         <div class="flex items-center justify-between gap-4">
-                            <div class="font-medium">{{ $message->to_number ?: $message->from_number }}</div>
+                            <div class="wrap-anywhere font-medium">{{ $message->to_number ?: $message->from_number }}</div>
                             <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium">{{ $message->status }}</span>
                         </div>
-                        <div class="mt-1 truncate text-zinc-500">{{ $message->content }}</div>
+                        <div class="wrap-anywhere mt-1 text-zinc-500">{{ $message->content }}</div>
                     </div>
                 @empty
-                    <div class="px-4 py-8 text-sm text-zinc-500">Belum ada pesan.</div>
+                    <div class="px-4 py-8 text-sm text-zinc-500">No messages yet.</div>
                 @endforelse
             </div>
         </div>

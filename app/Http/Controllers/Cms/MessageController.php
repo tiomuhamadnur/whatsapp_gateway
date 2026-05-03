@@ -9,9 +9,11 @@ use App\Models\MessageLog;
 use App\Models\WhatsappSession;
 use App\Services\QuotaService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use RuntimeException;
+use Yajra\DataTables\Facades\DataTables;
 
 class MessageController extends Controller
 {
@@ -35,6 +37,19 @@ class MessageController extends Controller
         ]);
     }
 
+    public function datatable(Request $request): JsonResponse
+    {
+        $query = Message::query()
+            ->where('user_id', $request->user()->id)
+            ->latest();
+
+        return DataTables::eloquent($query)
+            ->editColumn('id', fn (Message $message): string => number_format($message->id))
+            ->addColumn('target', fn (Message $message): string => $message->to_number ?: $message->from_number ?: '-')
+            ->editColumn('created_at', fn (Message $message): string => $message->created_at->format('Y-m-d H:i'))
+            ->toJson();
+    }
+
     public function store(Request $request, QuotaService $quota): RedirectResponse
     {
         $validated = $request->validate([
@@ -48,6 +63,14 @@ class MessageController extends Controller
             'recurrence' => ['nullable', 'in:none,daily,weekly,monthly,custom'],
             'recurrence_interval' => ['nullable', 'integer', 'min:1', 'max:365'],
             'recurrence_until' => ['nullable', 'date', 'after:scheduled_at'],
+        ], [], [
+            'session_id' => 'connected WhatsApp session',
+            'to' => 'recipient phone number or group ID',
+            'target_type' => 'target type',
+            'media_url' => 'media URL',
+            'scheduled_at' => 'scheduled send time',
+            'recurrence_interval' => 'repeat interval',
+            'recurrence_until' => 'repeat end time',
         ]);
 
         $user = $request->user();
@@ -58,21 +81,21 @@ class MessageController extends Controller
             ->exists();
 
         if (! $sessionExists) {
-            return back()->withErrors(['session_id' => 'Pilih sesi yang sudah connected.'])->withInput();
+            return back()->withErrors(['session_id' => 'Choose a WhatsApp session that is currently connected.'])->withInput();
         }
 
         if (! $quota->canSendType($user, $validated['type'])) {
-            return back()->withErrors(['type' => 'Paket Anda belum mendukung tipe pesan ini.'])->withInput();
+            return back()->withErrors(['type' => 'Your current plan does not support this message type.'])->withInput();
         }
 
         if (! $quota->hasQuota($user)) {
-            return back()->withErrors(['message' => 'Kuota pesan habis. Silakan upgrade paket Anda.'])->withInput();
+            return back()->withErrors(['message' => 'Your message quota has been used up. Upgrade your plan to send more messages.'])->withInput();
         }
 
         try {
             $quota->decrementQuota($user);
         } catch (RuntimeException) {
-            return back()->withErrors(['message' => 'Kuota pesan habis. Silakan upgrade paket Anda.'])->withInput();
+            return back()->withErrors(['message' => 'Your message quota has been used up. Upgrade your plan to send more messages.'])->withInput();
         }
 
         $status = isset($validated['scheduled_at']) && now()->lt($validated['scheduled_at']) ? 'scheduled' : 'queued';
@@ -104,6 +127,6 @@ class MessageController extends Controller
             SendWhatsAppMessage::dispatch($message->id);
         }
 
-        return redirect()->route('cms.messages.index')->with('status', 'Pesan masuk queue.');
+        return redirect()->route('cms.messages.index')->with('status', 'Message queued successfully.');
     }
 }

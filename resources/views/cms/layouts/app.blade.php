@@ -13,7 +13,7 @@
                 <a href="{{ route('cms.dashboard') }}" class="font-semibold tracking-tight">WA Gateway</a>
                 <form method="POST" action="{{ route('cms.logout') }}" class="lg:hidden">
                     @csrf
-                    <button class="text-sm text-zinc-600">Logout</button>
+                    <button class="rounded-md border border-zinc-300 px-3 py-1 text-sm font-medium text-zinc-700 hover:bg-zinc-100">Logout</button>
                 </form>
             </div>
             <nav class="flex gap-1 overflow-x-auto px-3 pb-3 lg:block lg:space-y-1 lg:overflow-visible">

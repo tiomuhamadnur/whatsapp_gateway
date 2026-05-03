@@ -48,6 +48,8 @@ class SendWhatsAppMessage implements ShouldQueue
         $message->update(['status' => 'sending']);
         $this->log($message, 'sending', 'Message handed to WhatsApp node service.');
 
+        \Log::info("Sending message ID {$message->id} to {$message->to_number}");
+
         try {
             $response = $node->sendMessage([
                 'message_id' => $message->id,

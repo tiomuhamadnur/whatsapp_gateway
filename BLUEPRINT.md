@@ -383,8 +383,7 @@ CREATE TABLE message_logs (
 
 | Volume | Tujuan |
 |--------|--------|
-| `mysql_data` | Persistensi database MySQL |
-| `sessions_data` | File session Baileys (backup) |
+| `mysql_data` | Persistensi database MySQL dan Baileys auth/session state |
 | `laravel_storage` | Storage Laravel |
 
 ### Network
@@ -848,6 +847,17 @@ Gunakan section ini untuk tracking progress build. Update setiap sesi kerja.
 
 ### 🔄 Sedang Dikerjakan
 - [ ] End-to-end WhatsApp/device testing
+- [ ] Fix message sending issues: multiple sends for contacts, group messages not working, media messages not working
+- [ ] Update status API to include quota remaining and subscription expiry
+- [x] Fix group ID display in CMS (showing 1,2,3 instead of xxx@g.us)
+- [x] Ensure all API responses are JSON with descriptive error messages
+- [x] Support phone number format with leading 0 (convert to 62)
+- [x] Increase to_number column length to 255 for group IDs
+- [x] Add validation for target length (max 255)
+- [x] Center all modals (vertical and horizontal)
+- [x] Format API documentation JSON body examples with pretty printing
+- [x] Auto-scale large quota numbers to K, M, B format
+- [x] Fix navbar logout button visibility and styling
 
 ### 📋 Belum Dikerjakan
 
@@ -911,6 +921,10 @@ Gunakan section ini untuk tracking progress build. Update setiap sesi kerja.
 - [x] Scheduler: dispatch scheduled messages every minute
 - [x] Tables: `whatsapp_groups`, `whatsapp_contacts`
 - [x] Tables: pricing fields on plans/subscriptions
+- [x] Fix session restore with corrupted creds.me
+- [x] Update status API with quota remaining and subscription expiry
+- [x] Add logging to message sending for debugging
+- [x] Prevent multiple targets for contact messages
 
 #### Testing & Deployment
 - [ ] Test connect WA via QR
@@ -996,3 +1010,5 @@ curl -H "Authorization: Bearer {NODE_INTERNAL_SECRET}" \
 
 > **Last updated:** Sesi build kelima — modal CRUD, persistent directory cache, scheduled/recurring/broadcast/group messaging, pricing, collapsible sidebar, logo, README install guide, dan UI shell modern selesai dibuat.
 > **Next step:** Test end-to-end scheduled delivery dengan `php artisan schedule:work`, test broadcast quota, dan validasi UX di mobile/tablet.
+
+> **Revision update:** Livewire session cards, Yajra DataTables endpoints, Font Awesome sidebar icons, English UI copy, centered confirmation modal flow, responsive API docs, database-backed Baileys auth state, and 60-day message history pruning have been added.

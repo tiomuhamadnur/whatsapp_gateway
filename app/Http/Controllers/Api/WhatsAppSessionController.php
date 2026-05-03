@@ -38,7 +38,7 @@ class WhatsAppSessionController extends Controller
         if ($currentSessions >= $quota->getMaxSessions($user)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Batas jumlah sesi WhatsApp untuk paket Anda sudah tercapai.',
+                'message' => 'Your current plan has reached the maximum number of WhatsApp sessions.',
                 'code' => 'SESSION_LIMIT_REACHED',
             ], 422);
         }
@@ -77,9 +77,11 @@ class WhatsAppSessionController extends Controller
         ]);
     }
 
-    public function status(Request $request, string $sessionId): JsonResponse
+    public function status(Request $request, string $sessionId, QuotaService $quota): JsonResponse
     {
         $session = $this->ownedSession($request, $sessionId);
+        $user = $request->user();
+        $subscription = $user->subscription;
 
         return response()->json([
             'success' => true,
@@ -88,6 +90,8 @@ class WhatsAppSessionController extends Controller
                 'status' => $session->status,
                 'phone_number' => $session->phone_number,
                 'last_active_at' => $session->last_active_at,
+                'quota_remaining' => $quota->getRemainingQuota($user),
+                'subscription_expires_at' => $subscription?->ends_at,
             ],
         ]);
     }

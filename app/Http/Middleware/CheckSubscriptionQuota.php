@@ -18,7 +18,7 @@ class CheckSubscriptionQuota
         if (! $this->quota->hasQuota($request->user())) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kuota pesan habis. Silakan upgrade paket Anda.',
+                'message' => 'Your message quota has been used up. Upgrade your plan to send more messages.',
                 'code' => 'QUOTA_EXCEEDED',
             ], 402);
         }

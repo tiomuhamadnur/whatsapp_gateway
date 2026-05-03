@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/dashboard', DashboardController::class)->name('cms.dashboard');
     Route::get('/sessions', [SessionController::class, 'index'])->name('cms.sessions.index');
+    Route::get('/sessions/datatable', [SessionController::class, 'datatable'])->name('cms.sessions.datatable');
     Route::post('/sessions', [SessionController::class, 'store'])->name('cms.sessions.store');
     Route::patch('/sessions/{sessionId}', [SessionController::class, 'update'])->name('cms.sessions.update');
     Route::post('/sessions/{sessionId}/disconnect', [SessionController::class, 'disconnect'])->name('cms.sessions.disconnect');
@@ -44,6 +45,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/sessions/{sessionId}/contacts', [DirectoryController::class, 'contacts'])->name('cms.sessions.contacts');
 
     Route::get('/messages', [MessageController::class, 'index'])->name('cms.messages.index');
+    Route::get('/messages/datatable', [MessageController::class, 'datatable'])->name('cms.messages.datatable');
     Route::post('/messages', [MessageController::class, 'store'])->name('cms.messages.store');
 
     Route::get('/api-tokens', [ApiTokenController::class, 'index'])->name('cms.tokens.index');

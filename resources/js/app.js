@@ -63,7 +63,7 @@ function bootDataTables() {
 
             const start = matched.length === 0 ? 0 : (page - 1) * perPage + 1;
             const end = Math.min(page * perPage, matched.length);
-            info.textContent = `${start}-${end} dari ${matched.length} data`;
+            info.textContent = `${start}-${end} of ${matched.length.toLocaleString()} records`;
             pageLabel.textContent = `${page} / ${totalPages}`;
             prev.disabled = page <= 1;
             next.disabled = page >= totalPages;
@@ -96,6 +96,8 @@ document.addEventListener('click', (event) => {
     const openButton = event.target.closest('[data-modal-open]');
     const closeButton = event.target.closest('[data-modal-close]');
     const sidebarButton = event.target.closest('[data-sidebar-toggle]');
+    const sidebarClose = event.target.closest('[data-sidebar-close], [data-sidebar-backdrop], [data-sidebar-link]');
+    const confirmButton = event.target.closest('button[data-confirm], a[data-confirm]');
 
     if (openButton) {
         document.getElementById(openButton.dataset.modalOpen)?.showModal();
@@ -106,9 +108,72 @@ document.addEventListener('click', (event) => {
     }
 
     if (sidebarButton) {
-        document.documentElement.classList.toggle('sidebar-collapsed');
-        localStorage.setItem('sidebar-collapsed', document.documentElement.classList.contains('sidebar-collapsed') ? '1' : '0');
+        if (window.matchMedia('(min-width: 1024px)').matches) {
+            document.documentElement.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebar-collapsed', document.documentElement.classList.contains('sidebar-collapsed') ? '1' : '0');
+        } else {
+            document.documentElement.classList.toggle('sidebar-open');
+        }
     }
+
+    if (sidebarClose && !window.matchMedia('(min-width: 1024px)').matches) {
+        document.documentElement.classList.remove('sidebar-open');
+    }
+
+    if (confirmButton && !confirmButton.dataset.confirmed) {
+        event.preventDefault();
+        const modal = document.getElementById('confirm-action-modal');
+        const message = document.getElementById('confirm-action-message');
+        const ok = modal?.querySelector('[data-confirm-ok]');
+        const cancel = modal?.querySelector('[data-confirm-cancel]');
+
+        if (!modal || !ok || !cancel) {
+            return;
+        }
+
+        message.textContent = confirmButton.dataset.confirm || 'Are you sure you want to continue?';
+        modal.showModal();
+
+        ok.onclick = () => {
+            confirmButton.dataset.confirmed = '1';
+            modal.close();
+            confirmButton.click();
+            delete confirmButton.dataset.confirmed;
+        };
+
+        cancel.onclick = () => modal.close();
+    }
+});
+
+document.addEventListener('submit', (event) => {
+    const form = event.target.closest('form[data-confirm]');
+
+    if (!form || form.dataset.confirmed) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const modal = document.getElementById('confirm-action-modal');
+    const message = document.getElementById('confirm-action-message');
+    const ok = modal?.querySelector('[data-confirm-ok]');
+    const cancel = modal?.querySelector('[data-confirm-cancel]');
+
+    if (!modal || !ok || !cancel) {
+        return;
+    }
+
+    message.textContent = form.dataset.confirm || 'Are you sure you want to continue?';
+    modal.showModal();
+
+    ok.onclick = () => {
+        form.dataset.confirmed = '1';
+        modal.close();
+        form.requestSubmit();
+        delete form.dataset.confirmed;
+    };
+
+    cancel.onclick = () => modal.close();
 });
 
 if (localStorage.getItem('sidebar-collapsed') === '1') {

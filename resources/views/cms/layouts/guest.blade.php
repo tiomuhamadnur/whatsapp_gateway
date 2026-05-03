@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,7 +11,7 @@
         <div class="w-full max-w-md">
             <div class="mb-8">
                 <div class="text-sm font-medium text-zinc-400">WA Gateway SaaS</div>
-                <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ $heading ?? $title ?? 'Masuk' }}</h1>
+                <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ $heading ?? $title ?? 'Login' }}</h1>
             </div>
             <div class="rounded-lg border border-white/10 bg-white p-6 text-zinc-950 shadow-2xl">
                 @if ($errors->any())

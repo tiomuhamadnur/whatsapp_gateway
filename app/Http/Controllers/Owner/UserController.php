@@ -56,7 +56,7 @@ class UserController extends Controller
             );
         }
 
-        return back()->with('status', 'User berhasil diperbarui.');
+        return back()->with('status', 'User updated successfully.');
     }
 
     public function issueToken(User $user): RedirectResponse
@@ -64,7 +64,7 @@ class UserController extends Controller
         $token = $user->createToken('Owner Issued API Key')->plainTextToken;
 
         return back()
-            ->with('status', 'Token API baru berhasil dibuat untuk '.$user->email.'.')
+            ->with('status', 'A new API token was created for '.$user->email.'.')
             ->with('owner_plain_text_token', $token)
             ->with('owner_token_user', $user->email);
     }

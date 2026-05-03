@@ -28,7 +28,7 @@ class ApiTokenController extends Controller
         return redirect()
             ->route('cms.tokens.index')
             ->with('plain_text_token', $token)
-            ->with('status', 'Token API berhasil dibuat. Simpan token ini karena hanya ditampilkan sekali.');
+            ->with('status', 'API token created successfully. Store it now because it is only shown once.');
     }
 
     public function destroy(Request $request, int $tokenId): RedirectResponse

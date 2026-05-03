@@ -1,10 +1,10 @@
-const fs = require('fs');
-const path = require('path');
 const makeWASocket = require('@whiskeysockets/baileys').default;
 const {
+  BufferJSON,
   DisconnectReason,
   fetchLatestBaileysVersion,
-  useMultiFileAuthState
+  initAuthCreds,
+  proto
 } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const QRCode = require('qrcode');
@@ -13,11 +13,6 @@ const webhook = require('./webhook.service');
 
 const sessions = new Map();
 const logger = pino({ level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'development' ? 'info' : 'silent') });
-const sessionRoot = process.env.SESSION_PATH || path.join(process.cwd(), 'sessions');
-
-function sessionPath(sessionId) {
-  return path.join(sessionRoot, sessionId);
-}
 
 async function createSession(sessionId) {
   if (sessions.has(sessionId)) {
@@ -25,9 +20,8 @@ async function createSession(sessionId) {
   }
 
   console.log(`[session:${sessionId}] creating WhatsApp socket`);
-  fs.mkdirSync(sessionPath(sessionId), { recursive: true });
 
-  const { state, saveCreds } = await useMultiFileAuthState(sessionPath(sessionId));
+  const { state, saveCreds } = await useDatabaseAuthState(sessionId);
   const { version } = await fetchLatestBaileysVersion();
 
   console.log(`[session:${sessionId}] using Baileys version ${version.join('.')}`);
@@ -49,9 +43,6 @@ async function createSession(sessionId) {
 
   sock.ev.on('creds.update', async () => {
     await saveCreds();
-    await db.updateSession(sessionId, {
-      session_data: JSON.stringify({ storage: 'multi_file', path: sessionPath(sessionId) })
-    });
   });
 
   sock.ev.on('connection.update', async (update) => {
@@ -73,6 +64,79 @@ async function createSession(sessionId) {
   });
 
   return sessionSnapshot(sessionId);
+}
+
+async function useDatabaseAuthState(sessionId) {
+  const stored = await readAuthState(sessionId);
+  const authState = stored || {
+    creds: initAuthCreds(),
+    keys: {}
+  };
+
+  const saveState = async () => {
+    await db.updateSessionData(sessionId, JSON.parse(JSON.stringify(authState, BufferJSON.replacer)));
+  };
+
+  return {
+    state: {
+      creds: authState.creds,
+      keys: {
+        get: async (type, ids) => {
+          const data = {};
+
+          for (const id of ids) {
+            const key = `${type}-${id}`;
+            let value = authState.keys[key];
+
+            if (type === 'app-state-sync-key' && value) {
+              value = proto.Message.AppStateSyncKeyData.fromObject(value);
+            }
+
+            data[id] = value;
+          }
+
+          return data;
+        },
+        set: async (data) => {
+          for (const [type, records] of Object.entries(data)) {
+            for (const [id, value] of Object.entries(records)) {
+              const key = `${type}-${id}`;
+
+              if (value) {
+                authState.keys[key] = value;
+              } else {
+                delete authState.keys[key];
+              }
+            }
+          }
+
+          await saveState();
+        }
+      }
+    },
+    saveCreds: saveState
+  };
+}
+
+async function readAuthState(sessionId) {
+  const raw = await db.getSessionData(sessionId);
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw, BufferJSON.reviver);
+    if (!parsed.creds?.me) {
+      console.warn(`[session:${sessionId}] stored auth state is missing 'me', starting clean`);
+      return null;
+    }
+    return parsed;
+  } catch (error) {
+    console.warn(`[session:${sessionId}] stored auth state is invalid, starting clean`, error.message);
+
+    return null;
+  }
 }
 
 function getSession(sessionId) {
@@ -116,12 +180,24 @@ async function sendMessage(payload) {
     throw Object.assign(new Error('Session disconnected'), { status: 422 });
   }
 
+  console.log(`[session:${payload.session_id}] sending message`, {
+    to: payload.to,
+    type: payload.type,
+    hasMedia: Boolean(payload.media_url),
+    targetType: payload.target_type
+  });
+
   await randomDelay();
 
   const jid = normalizeJid(payload.to);
   const content = buildMessageContent(payload);
+
+  console.log(`[session:${payload.session_id}] built content`, { jid, contentKeys: Object.keys(content) });
+
   const result = await retry(() => session.sock.sendMessage(jid, content), 3);
   const waMessageId = result?.key?.id || null;
+
+  console.log(`[session:${payload.session_id}] message sent`, { jid, waMessageId });
 
   await webhook.sendWebhook('message.sent', {
     message_id: payload.message_id,
@@ -300,7 +376,12 @@ function normalizeJid(number) {
     return String(number);
   }
 
-  const clean = String(number).replace(/\D/g, '');
+  let clean = String(number).replace(/\D/g, '');
+
+  // Convert leading 0 to 62 for Indonesian numbers
+  if (clean.startsWith('0')) {
+    clean = '62' + clean.slice(1);
+  }
 
   return `${clean}@s.whatsapp.net`;
 }
@@ -361,6 +442,7 @@ async function retry(callback, attempts) {
     try {
       return await callback();
     } catch (error) {
+      console.error(`Retry attempt ${attempt} failed:`, error.message);
       lastError = error;
       await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
     }

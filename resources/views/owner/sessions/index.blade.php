@@ -1,5 +1,5 @@
 <x-cms.layouts.app title="All Sessions" heading="All Sessions & Devices" eyebrow="Owner">
-    <x-cms.data-table search="Cari user, device, status, nomor..." per-page="12">
+    <x-cms.data-table search="Search user, device, status, or phone..." per-page="12">
         <table class="min-w-full divide-y divide-zinc-200 text-sm">
             <thead class="bg-zinc-50 text-left text-xs font-semibold uppercase text-zinc-500">
                 <tr>
@@ -20,7 +20,7 @@
                         </td>
                         <td class="px-4 py-3">
                             <div class="font-medium">{{ $session->name ?: 'Untitled' }}</div>
-                            <div class="break-all text-xs text-zinc-500">{{ $session->session_id }}</div>
+                            <div class="wrap-anywhere text-xs text-zinc-500">{{ $session->session_id }}</div>
                         </td>
                         <td class="px-4 py-3">{{ $session->phone_number ?: '-' }}</td>
                         <td class="px-4 py-3">{{ $session->status }}</td>

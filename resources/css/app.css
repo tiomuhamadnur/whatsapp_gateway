@@ -33,4 +33,22 @@
     .sidebar-collapsed .content-shell {
         margin-left: 5rem;
     }
+
+    .sidebar-open [data-sidebar] {
+        transform: translateX(0);
+    }
+
+    .sidebar-open [data-sidebar-backdrop] {
+        display: block;
+    }
+
+    .required-mark {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .wrap-anywhere {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
 }

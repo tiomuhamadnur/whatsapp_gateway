@@ -22,3 +22,11 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/messages', [MessageController::class, 'index']);
     Route::post('/messages/send', [MessageController::class, 'send']);
 });
+
+Route::fallback(function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'API endpoint not found',
+        'code' => 'ENDPOINT_NOT_FOUND',
+    ], 404);
+});

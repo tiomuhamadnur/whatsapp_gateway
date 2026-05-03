@@ -41,6 +41,21 @@ async function updateSession(sessionId, values) {
   );
 }
 
+async function getSessionData(sessionId) {
+  const [rows] = await client().execute(
+    'SELECT session_data FROM whatsapp_sessions WHERE session_id = :sessionId LIMIT 1',
+    { sessionId }
+  );
+
+  return rows[0]?.session_data || null;
+}
+
+async function updateSessionData(sessionId, sessionData) {
+  await updateSession(sessionId, {
+    session_data: JSON.stringify(sessionData)
+  });
+}
+
 async function connectedSessions() {
   const [rows] = await client().execute(
     'SELECT session_id FROM whatsapp_sessions WHERE status = :status',
@@ -54,5 +69,7 @@ module.exports = {
   connect,
   client,
   updateSession,
+  getSessionData,
+  updateSessionData,
   connectedSessions
 };
