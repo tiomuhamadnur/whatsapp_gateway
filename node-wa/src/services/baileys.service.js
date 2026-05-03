@@ -192,7 +192,11 @@ async function sendMessage(payload) {
   const jid = normalizeJid(payload.to);
   const content = buildMessageContent(payload);
 
-  console.log(`[session:${payload.session_id}] built content`, { jid, contentKeys: Object.keys(content) });
+  console.log(`[session:${payload.session_id}] built content`, {
+    jid,
+    contentKeys: Object.keys(content),
+    mediaUrl: payload.media_url
+  });
 
   const result = await retry(() => session.sock.sendMessage(jid, content), 3);
   const waMessageId = result?.key?.id || null;

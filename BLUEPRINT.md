@@ -858,6 +858,7 @@ Gunakan section ini untuk tracking progress build. Update setiap sesi kerja.
 - [x] Format API documentation JSON body examples with pretty printing
 - [x] Auto-scale large quota numbers to K, M, B format
 - [x] Fix navbar logout button visibility and styling
+- [x] Add media URL validation to check accessibility before sending
 
 ### 📋 Belum Dikerjakan
 

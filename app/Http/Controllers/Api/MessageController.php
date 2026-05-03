@@ -92,6 +92,14 @@ class MessageController extends Controller
             ], 422);
         }
 
+        if (in_array($type, ['image', 'document', 'audio', 'video']) && ! $this->isValidMediaUrl($validated['media_url'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Media URL is not accessible or invalid. Please use a publicly accessible URL.',
+                'code' => 'INVALID_MEDIA_URL',
+            ], 422);
+        }
+
         if (! $quota->hasQuota($user)) {
             return response()->json([
                 'success' => false,
