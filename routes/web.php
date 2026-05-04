@@ -57,6 +57,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('cms.profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('cms.profile.update');
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('cms.profile.update-password');
+    Route::patch('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('cms.profile.update-photo');
 
     Route::middleware('owner')->prefix('owner')->name('owner.')->group(function (): void {
         Route::get('/', OwnerDashboardController::class)->name('dashboard');

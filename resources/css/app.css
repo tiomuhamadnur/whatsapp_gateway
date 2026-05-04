@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -6,79 +7,258 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+@layer base {
+    :root {
+        --background: #f7f3ec;
+        --foreground: #241f1b;
+        --card: #fffdf8;
+        --card-foreground: #241f1b;
+        --popover: #fffdf8;
+        --popover-foreground: #241f1b;
+        --primary: #2f241c;
+        --primary-foreground: #fffaf2;
+        --secondary: #efe6d8;
+        --secondary-foreground: #35291f;
+        --muted: #eee6da;
+        --muted-foreground: #76695d;
+        --accent: #e8d8c3;
+        --accent-foreground: #2f241c;
+        --destructive: #b42318;
+        --destructive-foreground: #fffaf2;
+        --border: #dfd2c2;
+        --input: #dfd2c2;
+        --ring: #9b7658;
+        --radius: 0.5rem;
+        --chart-1: #8b5e3c;
+        --chart-2: #2f6f68;
+        --chart-3: #c07a3a;
+        --chart-4: #6f5ca8;
+        --chart-5: #9f3f3f;
+    }
+
+    body {
+        background: var(--background);
+        color: var(--foreground);
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+        background: var(--card) !important;
+        border-color: var(--input) !important;
+        color: var(--foreground) !important;
+        border-radius: var(--radius) !important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--ring) !important;
+        box-shadow: 0 0 0 3px rgb(155 118 88 / 0.16);
+    }
+
+    table {
+        color: var(--foreground);
+    }
+
+    thead {
+        background: var(--secondary) !important;
+    }
+
+    code,
+    pre {
+        border-radius: var(--radius);
+    }
+}
+
 @layer components {
+    .ui-card {
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--card-foreground);
+        border-radius: var(--radius);
+        box-shadow: 0 1px 2px rgb(36 31 27 / 0.04);
+    }
+
+    .ui-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .ui-icon {
+        display: inline-flex;
+        height: 2rem;
+        width: 2rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius);
+        background: var(--secondary);
+        color: var(--primary);
+    }
+
+    .ui-button,
+    button[class*="bg-zinc-950"],
+    a[class*="bg-zinc-950"] {
+        background: var(--primary) !important;
+        color: var(--primary-foreground) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 1px 2px rgb(36 31 27 / 0.08);
+    }
+
+    .ui-button:hover,
+    button[class*="bg-zinc-950"]:hover,
+    a[class*="bg-zinc-950"]:hover {
+        background: #1f1712 !important;
+    }
+
+    button[class*="border"],
+    a[class*="border"] {
+        border-color: var(--border) !important;
+        border-radius: var(--radius) !important;
+    }
+
+    .bg-white,
+    .bg-white\/90,
+    .bg-white\/95 {
+        background-color: var(--card) !important;
+    }
+
+    .bg-zinc-50,
+    .bg-zinc-100 {
+        background-color: var(--secondary) !important;
+    }
+
+    .text-zinc-950 {
+        color: var(--foreground) !important;
+    }
+
+    .text-zinc-700,
+    .text-zinc-600,
+    .text-zinc-500,
+    .text-zinc-400 {
+        color: var(--muted-foreground) !important;
+    }
+
+    .border-zinc-100,
+    .border-zinc-200,
+    .border-zinc-300 {
+        border-color: var(--border) !important;
+    }
+
+    .divide-zinc-100 > :not([hidden]) ~ :not([hidden]),
+    .divide-zinc-200 > :not([hidden]) ~ :not([hidden]) {
+        border-color: var(--border) !important;
+    }
+
     .sidebar-shell {
         transition: width 180ms ease, transform 180ms ease;
+        background: var(--card) !important;
+        border-color: var(--border) !important;
     }
 
     .sidebar-label {
         transition: opacity 160ms ease, width 160ms ease;
     }
 
-    .sidebar-collapsed [data-sidebar] {
-        width: 5rem;
+    /* Mobile sidebar state */
+    @media (max-width: 1023px) {
+        [data-sidebar] {
+            transform: translateX(-100%) !important;
+            transition: transform 200ms ease;
+        }
+
+        .sidebar-open [data-sidebar] {
+            transform: translateX(0) !important;
+        }
+
+        .sidebar-open [data-sidebar-backdrop] {
+            display: block !important;
+        }
     }
 
-    .sidebar-collapsed [data-sidebar] nav {
-        align-items: center;
-    }
+    /* Desktop sidebar collapsed state */
+    @media (min-width: 1024px) {
+        .sidebar-collapsed [data-sidebar] {
+            width: 5rem;
+        }
 
-    .sidebar-collapsed [data-sidebar] a {
-        justify-content: center;
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
+        .sidebar-collapsed [data-sidebar] nav {
+            align-items: center;
+        }
 
-    .sidebar-collapsed .sidebar-label {
-        display: none;
-        opacity: 0;
-        width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-    }
+        .sidebar-collapsed [data-sidebar] a {
+            justify-content: center;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
 
-    .sidebar-collapsed [data-sidebar] a {
-        position: relative;
-    }
+        .sidebar-collapsed .sidebar-label {
+            display: none;
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
 
-    .sidebar-collapsed [data-sidebar] a:hover .sidebar-label {
-        display: block;
-        position: absolute;
-        left: 5.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-        white-space: nowrap;
-        z-index: 20;
-        padding: 0.5rem 0.75rem;
-        background: #ffffff;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-    }
+        .sidebar-collapsed [data-sidebar] a {
+            position: relative;
+        }
 
-    .sidebar-collapsed .content-shell {
-        margin-left: 5rem;
-    }
+        .sidebar-collapsed [data-sidebar] a:hover .sidebar-label {
+            display: block;
+            position: absolute;
+            left: 5.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            z-index: 20;
+            padding: 0.5rem 0.75rem;
+            background: var(--popover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgb(36 31 27 / 0.08);
+        }
 
-    .sidebar-open [data-sidebar] {
-        transform: translateX(0);
-    }
-
-    .sidebar-open [data-sidebar-backdrop] {
-        display: block;
+        .sidebar-collapsed .content-shell {
+            margin-left: 5rem;
+        }
     }
 
     .required-mark {
-        color: #dc2626;
+        color: var(--destructive);
         font-weight: 700;
     }
 
     .wrap-anywhere {
         overflow-wrap: anywhere;
         word-break: break-word;
+    }
+
+    dialog {
+        background: var(--popover) !important;
+        color: var(--popover-foreground) !important;
+        border-color: var(--border) !important;
+        border-radius: var(--radius) !important;
     }
 }

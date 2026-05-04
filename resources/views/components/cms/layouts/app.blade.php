@@ -11,22 +11,21 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-zinc-50 text-zinc-950 antialiased">
+<body class="min-h-screen antialiased">
     <div class="min-h-screen lg:flex">
-        <aside data-sidebar class="sidebar-shell fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-zinc-200 bg-white/95 backdrop-blur transition-transform lg:translate-x-0 lg:w-64">
-            <div class="flex h-16 items-center justify-between px-5 lg:h-20">
+        <aside data-sidebar class="sidebar-shell fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r px-2 py-3 backdrop-blur transition-transform lg:translate-x-0 lg:w-64">
+            <div class="flex h-16 items-center justify-between px-3 lg:h-18">
                 <a href="{{ route('cms.dashboard') }}">
                     <x-cms.logo />
                 </a>
-                <button type="button" data-sidebar-close class="rounded-md border border-zinc-300 px-2 py-1 text-sm lg:hidden" aria-label="Close sidebar">
+                <button type="button" data-sidebar-close class="rounded-md border px-2 py-1 text-sm lg:hidden" aria-label="Close sidebar">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <nav class="space-y-1 overflow-y-auto px-3 pb-3">
+            <nav class="space-y-1 overflow-y-auto px-1 pb-3">
                 @php
                     $items = [
                         ['Dashboard', 'cms.dashboard', 'fa-chart-line'],
-                        ['Profile', 'cms.profile.edit', 'fa-user'],
                         ['Sessions', 'cms.sessions.index', 'fa-mobile-screen-button'],
                         ['Messages', 'cms.messages.index', 'fa-comments'],
                         ['API Tokens', 'cms.tokens.index', 'fa-key'],
@@ -57,17 +56,17 @@
                 @endif
             </nav>
         </aside>
-        <div data-sidebar-backdrop class="fixed inset-0 z-30 hidden bg-zinc-950/40 lg:hidden"></div>
+        <div data-sidebar-backdrop class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
 
         <main class="content-shell lg:ml-64 lg:flex-1">
-            <header class="sticky top-0 z-20 border-b border-zinc-200 bg-white/90 backdrop-blur">
+            <header class="sticky top-0 z-20 border-b backdrop-blur">
                 <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
                     <div class="flex items-center gap-3">
-                        <button type="button" data-sidebar-toggle class="rounded-md border border-zinc-300 px-2 py-1.5 text-sm" aria-label="Toggle sidebar">
+                        <button type="button" data-sidebar-toggle class="rounded-md border px-2 py-1.5 text-sm" aria-label="Toggle sidebar">
                             <i class="fa-solid fa-bars"></i>
                         </button>
                         <div>
-                            <p class="text-xs font-medium text-zinc-500">{{ $eyebrow ?? 'CMS' }}</p>
+                            <p class="text-xs font-medium text-[color:var(--muted-foreground)]">{{ $eyebrow ?? 'CMS' }}</p>
                             <h1 class="text-xl font-semibold tracking-tight">{{ $heading ?? $title ?? 'SapaChat' }}</h1>
                         </div>
                     </div>
@@ -75,19 +74,29 @@
                     <div class="flex items-center gap-3 text-sm">
                         <div class="hidden text-right sm:block">
                             <div class="font-medium">{{ auth()->user()->name }}</div>
-                            <div class="text-xs text-zinc-500">
+                            <div class="text-xs text-[color:var(--muted-foreground)]">
                                 {{ $activeSubscription?->productPlan?->name ?: 'No plan' }}
                                 @if ($activeSubscription?->ends_at)
                                     - exp {{ $activeSubscription->ends_at->format('Y-m-d') }}
                                 @endif
                             </div>
                         </div>
-                        <form method="POST" action="{{ route('cms.logout') }}">
-                            @csrf
-                            <button data-confirm="Sign out of this account?" class="rounded-md bg-zinc-950 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800">
-                                <i class="fa-solid fa-right-from-bracket sm:mr-1"></i><span class="hidden sm:inline">Logout</span>
+                        <div class="relative" data-profile-menu>
+                            <button data-profile-toggle type="button" class="rounded-md border px-2 py-1.5 text-sm hover:bg-[color:var(--secondary)]">
+                                <i class="fa-solid fa-user"></i>
                             </button>
-                        </form>
+                            <div data-profile-dropdown class="absolute right-0 mt-2 hidden w-48 rounded-md border border-[color:var(--border)] bg-white shadow-lg z-50">
+                                <a href="{{ route('cms.profile.edit') }}" class="flex items-center gap-2 px-4 py-3 text-sm hover:bg-[color:var(--secondary)] rounded-t-md">
+                                    <i class="fa-solid fa-user"></i> Profile
+                                </a>
+                                <form method="POST" action="{{ route('cms.logout') }}" class="border-t border-[color:var(--border)]">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-3 text-sm hover:bg-[color:var(--secondary)] text-red-600 hover:text-red-700 rounded-b-md flex items-center gap-2">
+                                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -111,18 +120,18 @@
                 @endif
 
                 {{ $slot }}
-                <footer class="mt-10 rounded-lg border-t border-zinc-200 pt-5 text-xs text-zinc-500">
+                <footer class="mt-10 rounded-lg border-t border-[color:var(--border)] pt-5 text-xs text-[color:var(--muted-foreground)]">
                     Developed by Tio Muhamad Nur © 2026
                 </footer>
             </div>
         </main>
     </div>
-    <dialog id="confirm-action-modal" class="w-[min(420px,calc(100vw-2rem))] rounded-lg border border-zinc-200 p-0 shadow-2xl backdrop:bg-zinc-950/40">
+    <dialog id="confirm-action-modal" class="w-[min(420px,calc(100vw-2rem))] rounded-lg border p-0 shadow-2xl backdrop:bg-black/40">
         <div class="p-5">
             <h2 class="text-base font-semibold">Confirm Action</h2>
-            <p id="confirm-action-message" class="mt-2 text-sm text-zinc-600">Are you sure you want to continue?</p>
+            <p id="confirm-action-message" class="mt-2 text-sm text-[color:var(--muted-foreground)]">Are you sure you want to continue?</p>
             <div class="mt-5 flex justify-end gap-2">
-                <button type="button" data-confirm-cancel class="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100">Cancel</button>
+                <button type="button" data-confirm-cancel class="rounded-md border px-3 py-2 text-sm font-medium hover:bg-zinc-100">Cancel</button>
                 <button type="button" data-confirm-ok class="rounded-md bg-zinc-950 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800">Continue</button>
             </div>
         </div>

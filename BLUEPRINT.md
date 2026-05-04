@@ -1014,3 +1014,4 @@ curl -H "Authorization: Bearer {NODE_INTERNAL_SECRET}" \
 > **Next step:** Test end-to-end scheduled delivery dengan `php artisan schedule:work`, test broadcast quota, dan validasi UX di mobile/tablet.
 
 > **Revision update:** Livewire session cards, Yajra DataTables endpoints, Font Awesome sidebar icons, English UI copy, centered confirmation modal flow, responsive API docs, database-backed Baileys auth state, and 60-day message history pruning have been added.
+> **UI refresh:** CMS and owner dashboards now follow the referenced TweakCN Porfolio theme direction with warm flat shadcn-style tokens, responsive cards, sidebar/header refinements, and informative dashboard charts.

@@ -127,8 +127,8 @@ async function readAuthState(sessionId) {
 
   try {
     const parsed = JSON.parse(raw, BufferJSON.reviver);
-    if (!parsed.creds?.me) {
-      console.warn(`[session:${sessionId}] stored auth state is missing 'me', starting clean`);
+    if (!parsed?.creds || !parsed?.keys) {
+      console.warn(`[session:${sessionId}] stored auth state uses an unsupported legacy format, starting clean`);
       return null;
     }
     return parsed;

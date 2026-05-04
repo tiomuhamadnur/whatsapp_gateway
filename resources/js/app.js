@@ -98,6 +98,7 @@ document.addEventListener('click', (event) => {
     const sidebarButton = event.target.closest('[data-sidebar-toggle]');
     const sidebarClose = event.target.closest('[data-sidebar-close], [data-sidebar-backdrop], [data-sidebar-link]');
     const confirmButton = event.target.closest('button[data-confirm], a[data-confirm]');
+    const profileToggle = event.target.closest('[data-profile-toggle]');
 
     if (openButton) {
         document.getElementById(openButton.dataset.modalOpen)?.showModal();
@@ -118,6 +119,19 @@ document.addEventListener('click', (event) => {
 
     if (sidebarClose && !window.matchMedia('(min-width: 1024px)').matches) {
         document.documentElement.classList.remove('sidebar-open');
+    }
+
+    if (profileToggle) {
+        event.preventDefault();
+        const dropdown = profileToggle.closest('[data-profile-menu]')?.querySelector('[data-profile-dropdown]');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+    }
+
+    // Close profile dropdown when clicking outside
+    if (!event.target.closest('[data-profile-menu]')) {
+        document.querySelectorAll('[data-profile-dropdown]').forEach(el => el.classList.add('hidden'));
     }
 
     if (confirmButton && !confirmButton.dataset.confirmed) {
